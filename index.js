@@ -1,10 +1,10 @@
+require('dotenv').config({ path: 'variables.env' })
 const express = require('express')
-const app = express()
-const routes = require('./routes/index')
+const cors = require('cors')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
-const cors = require('cors')
-require('dotenv').config({ path: 'variables.env' })
+const app = express()
+const routes = require('./routes/index')
 
 const port = process.env.PORT || 5000
 const host = process.env.HOST || '0.0.0.0'
@@ -16,8 +16,8 @@ mongoose.connect(process.env.MONGODB_URL_REMOTE, {
 	useCreateIndex: true,
 	useFindAndModify: true
 })
-.then(() => console.log('--> MongoDB conectado <--'))
-.catch(err => console.log('--> Error al conectar con Mongodb <--'))
+.then(() => console.log('MongoDB conectado'))
+.catch(err => console.log('Error al conectar con MongoDB'))
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -41,6 +41,4 @@ app.use(cors(corsOptions))
 
 app.use('/', routes())
 
-app.listen(port, host, () => {
-	console.log(`--> Servidor en puerto ${port} <--`)
-})
+app.listen(port, host, () => console.log(`Servidor en puerto ${port}`))

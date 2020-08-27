@@ -6,13 +6,14 @@ exports.nuevoPedido = async (req, res, next) => {
 	try {
 		const pedido = new Pedidos(req.body)
 		await pedido.save()
-		return res.json({
+		return res.status(200).json({
+			error: false,
 			mensaje: 'Nuevo pedido agregado'
 		})
 	} catch(err) {
-		res.json({
-			mensaje: 'Ha ocurrido un error',
-			error: true
+		res.status(500).json({
+			error: true,
+			mensaje: 'Ha ocurrido un error'
 		})
 		next()
 	}
@@ -27,16 +28,20 @@ exports.mostrarPedidos = async (req, res, next) => {
 			model: 'Productos'
 		})
 		if(!pedidos) {
-			res.json({
+			res.status(404).json({
+				error: true,
 				mensaje: 'No hay pedidos'
 			})
 			return next()
 		}
-		return res.json(pedidos)
+		return res.status(200).json({
+			error: false,
+			datos: pedidos
+		})
 	} catch(err) {
-		res.json({
-			mensaje: 'Ha ocurrido un error',
-			error: true
+		res.status(500).json({
+			error: true,
+			mensaje: 'Ha ocurrido un error'
 		})
 		next()
 	}
@@ -51,16 +56,20 @@ exports.mostrarPedido = async (req, res, next) => {
 			model: 'Productos'
 		})
 		if(!pedido) {
-			res.json({
+			res.status(404).json({
+				error: true,
 				mensaje: 'El pedido no existe'
 			})
 			return next()
 		}
-		return res.json(pedido)
+		return res.status(200).json({
+			error: false,
+			datos: pedido
+		})
 	} catch(err) {
-		res.json({
-			mensaje: 'Ha ocurrido un error',
-			error: true
+		res.status(500).json({
+			error: true,
+			mensaje: 'Ha ocurrido un error'
 		})
 		next()
 	}
@@ -83,18 +92,20 @@ exports.actualizarPedido = async (req, res, next) => {
 			model: 'Productos'
 		})
 		if(!pedido) {
-			res.json({
+			res.status(404).json({
+				error: true,
 				mensaje: 'No se ha podido actualizar el pedido'
 			})
 			return next()
 		}
-		return res.json({
+		return res.status(200).json({
+			error: false,
 			mensaje: 'Pedido actualizado'
 		})
 	} catch(err) {
-		res.json({
-			mensaje: 'Ha ocurrido un error',
-			error: true
+		res.status(500).json({
+			error: true,
+			mensaje: 'Ha ocurrido un error'
 		})
 		next()
 	}
@@ -105,13 +116,14 @@ exports.eliminarPedido = async (req, res, next) => {
 		await Pedidos.findOneAndDelete({
 			_id: req.params.idPedido
 		})
-		return res.json({
+		return res.status(200).json({
+			error: false,
 			mensaje: 'Pedido eliminado'
 		})
 	} catch(err) {
-		res.json({
-			mensaje: 'Ha ocurrido un error',
-			error: true
+		res.status(500).json({
+			error: true,
+			mensaje: 'Ha ocurrido un error'
 		})
 		next()
 	}

@@ -4,13 +4,14 @@ exports.nuevoCliente = async (req, res, next) => {
 	try {
 		const cliente = new Clientes(req.body)
 		await cliente.save()
-		return res.json({
+		return res.status(200).json({
+			error: false,
 			mensaje: 'Nuevo cliente agregado'
 		})
 	} catch(err) {
-		res.json({
-			mensaje: 'Ha ocurrido un error',
-			error: true
+		res.status(500).json({
+			error: true,
+			mensaje: 'Ha ocurrido un error'
 		})
 		next()
 	}
@@ -20,16 +21,20 @@ exports.mostrarClientes = async (req, res, next) => {
 	try {
 		const clientes = await Clientes.find({})
 		if(!clientes) {
-			res.json({
+			res.status(404).json({
+				error: true,
 				mensaje: 'No hay clientes'
 			})
 			return next()
 		}
-		return res.json(clientes)
+		return res.status(200).json({
+			error: false,
+			datos: clientes
+		})
 	} catch(err) {
-		res.json({
-			mensaje: 'Ha ocurrido un error',
-			error: true
+		res.status(500).json({
+			error: true,
+			mensaje: 'Ha ocurrido un error'
 		})
 		next()
 	}
@@ -39,16 +44,20 @@ exports.mostrarCliente = async (req, res, next) => {
 	try {
 		const cliente = await Clientes.findById(req.params.idCliente)
 		if(!cliente) {
-			res.json({
+			res.status(404).json({
+				error: true,
 				mensaje: 'Este cliente no existe'
 			})
 			return next()
 		}
-		return res.json(cliente)
+		return res.status(200).json({
+			error: false,
+			datos: cliente
+		})
 	} catch(err) {
-		res.json({
-			mensaje: 'Ha ocurrido un error',
-			error: true
+		res.status(500).json({
+			error: true,
+			mensaje: 'Ha ocurrido un error'
 		})
 		next()
 	}
@@ -65,18 +74,20 @@ exports.actualizarCliente = async (req, res, next) => {
 			new: true
 		})
 		if(!cliente) {
-			res.json({
+			res.status(404).json({
+				error: true,
 				mensaje: 'No se ha podido actualizar'
 			})
 			return next()
 		}
-		return res.json({
+		return res.status(200).json({
+			error: false,
 			mensaje: 'El cliente fue actualizado'
 		})
 	} catch(err) {
-		res.json({
-			mensaje: 'Ha ocurrido un error',
-			error: true
+		res.status(500).json({
+			error: true,
+			mensaje: 'Ha ocurrido un error'
 		})
 		next()
 	}
@@ -87,13 +98,14 @@ exports.eliminarCliente = async (req, res, next) => {
 		await Clientes.findOneAndDelete({
 			_id: req.params.idCliente
 		})
-		return res.json({
+		return res.status(200).json({
+			error: false,
 			mensaje: 'El cliente se ha eliminado'
 		})
 	} catch(err) {
-		res.json({
-			mensaje: 'Ha ocurrido un error',
-			error: true
+		res.status(500).json({
+			error: true,
+			mensaje: 'Ha ocurrido un error'
 		})
 		next()
 	}

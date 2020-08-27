@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const auth = require('../middleware/auth')
 const clienteController = require('../controllers/clienteController')
+const credentialsController = require('../controllers/credentialsController')
 const pedidosController = require('../controllers/pedidosController')
 const productosController = require('../controllers/productosController')
 const usuariosController = require('../controllers/usuariosController')
@@ -34,10 +35,15 @@ module.exports = function() {
 	              clienteController.eliminarCliente)
 
 	/** ZONA DE PRODUCTOS **/
+	/** Pedir credenciales de Cloudinary antes de agregar 
+		una imagen al producto, sino, no se carga ninguna imagen **/
+	router.post('/cloud-cred/:fileinfo',
+	            auth,
+	            credentialsController.obtenerCloudCred)
+
 	/** Agregar nuevos productos **/
 	router.post('/productos',
 	            auth,
-	            productosController.subirArchivo,
 	            productosController.nuevoProducto)
 
 	/** Obtener los productos **/
@@ -53,7 +59,6 @@ module.exports = function() {
 	/** Actualizar un producto **/
 	router.put('/productos/:idProducto',
 	           auth,
-	           productosController.subirArchivo,
 	           productosController.actualizarProducto)
 
 	/** Eliminar un producto por ID **/
@@ -65,6 +70,18 @@ module.exports = function() {
 	router.post('/productos/busqueda/:query',
 	            auth,
 	            productosController.buscarProducto)
+
+	/** Actualizar la imagen del producto **/
+	/*
+	router.post('/productos/editar/imagen/:idProducto',
+	            auth,
+	            productosController.actualizarImagenProducto)
+	*/
+
+	/** Agregar la imagen al producto **/
+	router.post('/productos/imagen/:id',
+	            auth,
+	            productosController.imagenProducto)
 
 	/** ZONA DE PEDIDOS **/
 	/** Agregar nuevos pedidos **/
