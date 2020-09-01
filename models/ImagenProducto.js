@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+
 const Schema = mongoose.Schema
 
 const imagenProductoSchema = new Schema({
@@ -6,7 +7,7 @@ const imagenProductoSchema = new Schema({
 	public_id: String,
 	created_at: Date,
 	owner: {
-		type: mongoose.Schema.ObjectId,
+		type: Schema.ObjectId,
 		ref: 'Productos'
 	}
 })

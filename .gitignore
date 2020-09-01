@@ -1,6 +1,3 @@
-node_modules 
-uploads
-Pasos.txt
+/node_modules 
 variables.env
-gists.js
 .DS_Store
