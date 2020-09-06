@@ -1,16 +1,18 @@
 ## CRM API
 
-## API para la administracion de clientes
+API para la administracion de clientes
 
-## Clonar repositorio (y elegir rama)
+## Pasos
 
-### `git clone <repository> --branch <master/dev> <directory>`
+Clonar repositorio
 
-## Instalar las dependencias necesarias
+### `git clone <repository> --branch <dev> <directory>`
+
+Instalar las dependencias necesarias
 
 ### `npm i`
 
-## Ejecutar la [API](http://localhost:5000)
+Ejecutar [API](http://localhost:5000)
 
 ### `npm run desarrollo`
 
@@ -19,4 +21,3 @@
 ### [MongoDBAtlas](https://www.mongodb.com/cloud/atlas)
 
 ### [Cloudinary](https://cloudinary.com/)
-
