@@ -1,20 +1,20 @@
 require('dotenv').config({ path: 'variables.env' })
 const Usuarios = require('../models/Usuarios')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
 exports.registrarUsuario = async (req, res, next) => {
 	try {
-		const usuarioDuplicado = await Usuarios.findOne({
-			email: req.body.email
-		})
+		const { email, password } = req.body
+		const usuarioDuplicado = await Usuarios.findOne({ email })
 		if(usuarioDuplicado) {
 			return res.status(403).json({
 				mensaje: 'Este email no puede utilizarse'
 			})
 		}
 		const usuario = new Usuarios(req.body)
-		usuario.password = await bcrypt.hash(req.body.password, 10)
+		const salt = bcrypt.genSaltSync()
+		usuario.password = bcrypt.hashSync(password, salt)
 		await usuario.save()
 		return res.status(200).json({
 			mensaje: 'Usuario creado'
