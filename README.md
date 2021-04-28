@@ -2,7 +2,7 @@
 
 API para la administracion de clientes
 
-Es consumida por la **[App](https://github.com/norbix14/crmclientenode)** en **`React`**
+Es consumida por la **[App](https://github.com/norbix14/crm)** en **`React`**
 
 ## Pasos
 
@@ -28,22 +28,23 @@ Cuentas en las siguientes plataformas
 
 **Variables de entorno en un archivo `.env`**
 
-		# Frase secreta para firmar JsonWebToken
-		JWT_SECRET=""
-
 		# Usuario y contraseña para eliminar usuario por POSTMAN
+		# Es opcional y no afecta la aplicacion mientras se usa
 		SUPER_USER=""
 		DELETE_AUTHORIZATION_PASSWORD=""
+
+		# Url del frontend (opcional por politicas CORS)
+		URL_CRM_FE_DEV=""
+		URL_CRM_FE_PROD=""
+
+		# Frase secreta para firmar JsonWebToken
+		JWT_SECRET=""
 
 		# Credenciales de la cuenta en Cloudinary
 		CLOUDINARY_CLOUD_NAME=""
 		CLOUDINARY_API_KEY=""
 		CLOUDINARY_API_SECRET=""
 		CLOUDINARY_URL_FRONTEND=""
-
-		# Url del frontend (opcional por politicas CORS)
-		URL_CRM_FE_DEV=""
-		URL_CRM_FE_PROD=""
 
 		# Uri de conexion a la cuenta en MongoDbAtlas
 		MONGODB_URI_LOCAL=""
