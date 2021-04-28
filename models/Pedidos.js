@@ -1,8 +1,13 @@
-const mongoose = require('mongoose')
+const { Schema, model } = require('mongoose')
 
-const Schema = mongoose.Schema
+/**
+ * Modulo que contiene el esquema/modelo
+ * de los pedidos
+ *
+ * @module models/Pedidos
+*/
 
-const pedidosSchema = new Schema({
+const PedidosSchema = new Schema({
 	cliente: {
 		type: Schema.ObjectId,
 		ref: 'Clientes'
@@ -23,4 +28,4 @@ const pedidosSchema = new Schema({
 	}
 })
 
-module.exports = mongoose.model('Pedidos', pedidosSchema)
+module.exports = model('Pedidos', PedidosSchema)

@@ -1,0 +1,11 @@
+{
+  "asi": true,
+  "eqeqeq": true,
+  "esversion": 9,
+  "lastsemic": true,
+  "node": true,
+  "trailingcomma": false,
+  "undef": true,
+  "unused": true,
+  "varstmt": false
+}

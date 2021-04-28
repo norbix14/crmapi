@@ -1,184 +1,192 @@
-const cloudinary = require('cloudinary').v2
 const ImagenProducto = require('../models/ImagenProducto')
 const Productos = require('../models/Productos')
+const {
+	deleteImageByPublicId
+} = require('../handlers/cloudinary-handler')
+const {
+	searchProductResponse,
+	showProductsResponse,
+	showProductResponse,
+	newProductResponse,
+	updateProductResponse,
+	deleteProductResponse
+} = require('../responses/products')
+const internalError = require('../responses/internalError')
 
-exports.buscarProducto = async (req, res, next) => {
+/**
+ * Modulo encargado del manejo de los productos
+ *
+ * @module controllers/productosController
+*/
+
+/**
+ * Funcion para verificar si un producto existe
+ *
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @param {function} next - continue to the next middleware
+ * @returns {Promise}
+*/
+exports.verificarProducto = async (req, res, next) => {
+	const { params } = req
 	try {
-		const { query } = req.params
-		const producto = await Productos.find({
+		const { idProducto } = params
+		const product = await Productos.findById(idProducto)
+		req.product = product
+		next()
+	} catch (error) {
+		req.product = null
+		next()
+	}
+}
+
+/**
+ * Funcion para verificar si la imagen de un producto existe
+ *
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @param {function} next - continue to the next middleware
+ * @returns {Promise}
+*/
+exports.verificarImagenProducto = async (req, res, next) => {
+	const { params } = req
+	try {
+		const { publicid } = params
+		const image = await ImagenProducto.findOne({ public_id: publicid })
+		req.image = image
+		next()
+	} catch (error) {
+		req.image = null
+		next()
+	}
+}
+
+/**
+ * Funcion para buscar un producto
+ * 
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @returns {Promise}
+*/
+exports.buscarProducto = async (req, res) => {
+	const { params } = req
+	try {
+		const { query } = params
+		const product = await Productos.find({
 			nombre: new RegExp(query, 'i')
 		})
-		if(!producto) {
-			res.status(404).json({
-				mensaje: 'No hay resultados para la búsqueda'
-			})
-			return next()
-		}
-		return res.json({
-			mensaje: 'Producto encontrado',
-			datos: producto
-		})
-	} catch(err) {
-		res.status(500).json({
-			mensaje: 'Ha ocurrido un error'
-		})
-		next()
+		return res.status(200).json(searchProductResponse(200, { product }))
+	} catch(error) {
+		return res.status(500).json(internalError({ errors: [ error ] }))
 	}
 }
 
-exports.mostrarProductos = async (req, res, next) => {
+/**
+ * Funcion para obtener todos los productos
+ * 
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @returns {Promise}
+*/
+exports.mostrarProductos = async (req, res) => {
 	try {
-		const productos = await Productos.find({})
-		if(!productos) {
-			res.status(404).json({
-				mensaje: 'No hay productos disponibles'
-			})
-			return next()
-		}
-		return res.status(200).json({
-			mensaje: 'Productos encontrados',
-			datos: productos
-		})
-	} catch(err) {
-		res.status(500).json({
-			mensaje: 'Ha ocurrido un error'
-		})
-		next()
+		const products = await Productos.find({})
+		return res.status(200).json(showProductsResponse(200, { products }))
+	} catch(error) {
+		return res.status(500).json(internalError({ errors: [ error ] }))
 	}
 }
 
-exports.mostrarProducto = async (req, res, next) => {
+/**
+ * Funcion para obtener todos los productos
+ * 
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @returns {Promise}
+*/
+exports.mostrarProducto = async (req, res) => {
+	const { params } = req
 	try {
-		const producto = await Productos.findById(req.params.idProducto)
-		if(!producto) {
-			res.status(404).json({
-				mensaje: 'No hay ningún producto disponible con este ID'
-			})
-			return next()
-		}
-		return res.json({
-			mensaje: 'Producto encontrado',
-			datos: producto
-		})
-	} catch(err) {
-		res.status(500).json({
-			mensaje: 'Ha ocurrido un error'
-		})
-		next()
+		const { idProducto } = params
+		const product = await Productos.findById(idProducto)
+		return res.status(200).json(showProductResponse(200, { product }))
+	} catch(error) {
+		return res.status(500).json(internalError({ errors: [ error ] }))
 	}
 }
 
-exports.nuevoProducto = async (req, res, next) => {
+/**
+ * Funcion para agregar un nuevo producto
+ * 
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @returns {Promise}
+*/
+exports.nuevoProducto = async (req, res) => {
+	const { body } = req
 	try {
-		const { nombre, precio } = req.body
-		const producto = new Productos({
+		const { nombre, precio } = body
+		const newProduct = new Productos({
 			nombre,
 			precio
 		})
-		await producto.save()
-		return res.status(200).json({
-			mensaje: 'Nuevo producto agregado'
-		})
-	} catch(err) {
-		res.status(500).json({
-			mensaje: 'Ha ocurrido un error'
-		})
-		next()
+		await newProduct.save()
+		return res.status(200).json(newProductResponse(200))
+	} catch(error) {
+		return res.status(500).json(internalError({ errors: [ error ] }))
 	}
 }
 
-exports.actualizarProducto = async (req, res, next) => {
+/**
+ * Funcion para actualizar un producto
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @returns {Promise}
+*/
+exports.actualizarProducto = async (req, res) => {
+	const { body, params } = req
 	try {
-		let productoActualizado = await Productos.findOneAndUpdate(
+		const { idProducto } = params
+		await Productos.findOneAndUpdate(
 			{
-				_id: req.params.idProducto
+				_id: idProducto
 			},
-			req.body,
+			body,
 			{
 				new: true
 			}
 		)
-		if(!productoActualizado) {
-			res.status(404).json({
-				mensaje: 'Ha ocurrido un error al actualizar el producto'
-			})
-			return next()
-		}
-		return res.status(200).json({
-			mensaje: 'Producto actualizado'
-		})
-	} catch(err) {
-		res.status(500).json({
-			mensaje: 'Ha ocurrido un error'
-		})
-		next()
+		return res.status(200).json(updateProductResponse(200))
+	} catch(error) {
+		return res.status(500).json(internalError({ errors: [ error ] }))
 	}
 }
 
-exports.eliminarProducto = async (req, res, next) => {
+/**
+ * Funcion para eliminar un producto
+ * 
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @returns {Promise}
+*/
+exports.eliminarProducto = async (req, res) => {
+	const { product } = req
 	try {
-		const producto = await Productos.findById(req.params.idProducto)
-		if(!producto) {
-			res.status(404).json({
-				mensaje: 'No hay ningún producto disponible con este ID'
-			})
-			return next()
+		if(!product) {
+			return res.status(404).json(deleteProductResponse(404))
 		}
-		const imagen = await ImagenProducto.findOne({
-			owner: producto._id
-		})
-		if(imagen) {
-			await cloudinary.uploader.destroy(imagen.public_id)
-			await ImagenProducto.findByIdAndDelete(imagen._id)
+		const { _id } = product
+		const productImage = await ImagenProducto.findOne({ owner: _id })
+		if (productImage) {
+			const { _id, public_id = null } = productImage
+			if (public_id) {
+				await deleteImageByPublicId(public_id)
+			}
+			await ImagenProducto.findByIdAndDelete(_id)
 		}
-		await Productos.findByIdAndDelete(producto._id)
-		return res.status(200).json({
-			mensaje: 'Producto eliminado'
-		})
-	} catch(err) {
-		res.status(500).json({
-			mensaje: 'Ha ocurrido un error'
-		})
-		next()
-	}
-}
-
-exports.imagenProducto = async (req, res, next) => {
-	try {
-		const { secure_url, public_id, created_at, owner } = req.body
-		const imagenProducto = new ImagenProducto({
-			secure_url,
-			public_id,
-			created_at,
-			owner: owner ? owner : ''
-		})
-		const producto = await Productos.findById(owner)
-		if(producto) {
-			producto.imagen = secure_url
-			await producto.save()
-		}
-		await imagenProducto.save()
-		return res.status(200).json({
-			mensaje: 'Imagen de producto agregada'
-		})
-	} catch(err) {
-		res.status(500).json({
-			mensaje: 'Ha ocurrido un error'
-		})
-		next()
-	}
-}
-
-exports.eliminarImagenProducto = async (req, res, next) => {
-	try {
-		await cloudinary.uploader.destroy(req.params.id)
-		return res.status(200).json({
-			mensaje: 'Imagen de producto eliminada'
-		})
-	} catch(err) {
-		res.status(500).json({
-			mensaje: 'Ha ocurrido un error'
-		})
-		next()
+		await Productos.findByIdAndDelete(_id)
+		return res.status(200).json(deleteProductResponse(200))
+	} catch(error) {
+		return res.status(500).json(internalError({ errors: [ error ] }))
 	}
 }

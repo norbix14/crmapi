@@ -1,13 +1,19 @@
-const mongoose = require('mongoose')
+const { Schema, model } = require('mongoose')
 
-const Schema = mongoose.Schema
+/**
+ * Modulo que contiene el esquema/modelo
+ * de los usuarios
+ *
+ * @module models/Usuarios
+*/
 
-const usuariosSchema = new Schema({
+const UsuariosSchema = new Schema({
 	email: {
 		type: String,
 		unique: true,
 		lowercase: true,
-		trim: true
+		trim: true,
+		required: true
 	},
 	nombre: {
 		type: String,
@@ -19,4 +25,4 @@ const usuariosSchema = new Schema({
 	}
 })
 
-module.exports = mongoose.model('Usuarios', usuariosSchema)
+module.exports = model('Usuarios', UsuariosSchema)

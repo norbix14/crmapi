@@ -1,25 +1,56 @@
-require('dotenv').config({ path: 'variables.env' })
-const jwt = require('jsonwebtoken')
+const { jwtVerify } = require('../handlers/jwt-handler')
 
-module.exports = (req, res, next) => {
-	const authHeader = req.get('Authorization')
-	if(!authHeader) {
-		const error = new Error('No autenticado. No hay JWT')
-		error.statusCode = 401
-		throw error
+/**
+ * Modulo encargado de la validacion del JWT
+ * 
+ * @module middleware/auth
+*/
+
+/**
+ * Middleware que verifica la existencia de la cabecera
+ * de autorizacion
+ *
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @param {function} next - continue to the next middleware
+*/
+exports.checkAuthorizationHeader = (req, res, next) => {
+	const authorizationHeader = req.get('Authorization')
+	if (!authorizationHeader) {
+		return res.status(403).json({
+			message: 'Permiso denegado',
+			explanation: `Missing Authorization Header`,
+			details: {}
+		})
 	}
-	const token = authHeader.split(' ')[1]
-	let revisarToken
-	try {
-		revisarToken = jwt.verify(token, process.env.JWT_SECRET)
-	} catch(error) {
-		error.statusCode = 500
-		throw error
-	}
-	if(!revisarToken) {
-		const error = new Error('No autenticado')
-		error.statusCode = 401
-		throw error
-	}
+	const token = authorizationHeader.split(' ')
+	req.token = token[1]
 	next()
+}
+
+/**
+ * Middleware que verifica si el token en la peticion
+ * es valido
+ * 
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @param {function} next - continue to the next middleware
+*/
+exports.verifyToken = (req, res, next) => {
+	const { token } = req
+	try {
+		const verifyToken = jwtVerify(token)
+		if (verifyToken) {
+			// do something if token es valid
+		}
+		next()
+	} catch (error) {
+		return res.status(500).json({
+			message: 'Error con el JWT',
+			explanation: `Hubo un problema con el token`,
+			details: {
+				errors: [ error ]
+			}
+		})
+	}	
 }

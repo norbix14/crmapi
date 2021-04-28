@@ -1,15 +1,22 @@
-const mongoose = require('mongoose')
+const { Schema, model } = require('mongoose')
 
-const Schema = mongoose.Schema
+/**
+ * Modulo que contiene el esquema/modelo
+ * de los clientes
+ * 
+ * @module models/Clientes
+*/
 
-const clientesSchema = new Schema({
+const ClientesSchema = new Schema({
 	nombre: {
 		type: String,
-		trim: true
+		trim: true,
+		required: true
 	},
 	apellido: {
 		type: String,
-		trim: true
+		trim: true,
+		required: true
 	},
 	empresa: {
 		type: String,
@@ -19,7 +26,8 @@ const clientesSchema = new Schema({
 		type: String,
 		unique: true,
 		lowercase: true,
-		trim: true
+		trim: true,
+		required: true
 	},
 	telefono: {
 		type: String,
@@ -27,4 +35,4 @@ const clientesSchema = new Schema({
 	}
 })
 
-module.exports = mongoose.model('Clientes', clientesSchema)
+module.exports = model('Clientes', ClientesSchema)

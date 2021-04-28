@@ -1,57 +1,84 @@
-require('dotenv').config({ path: 'variables.env' })
+require('dotenv').config()
 const Usuarios = require('../models/Usuarios')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
+const createResponse = require('../responses/response')
+const internalError = require('../responses/internalError')
 
-exports.registrarUsuario = async (req, res, next) => {
+/**
+ * Modulo encargado del manejo de los usuarios
+ *
+ * @module controllers/usuariosController
+*/
+
+/**
+ * Funcion para verificar si un usuario existe
+ *
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @param {function} next - continue to the next middleware
+ * @returns {Promise}
+*/
+exports.verificarUsuario = async (req, res, next) => {
+	const { body } = req
 	try {
-		const { email, password } = req.body
-		const usuarioDuplicado = await Usuarios.findOne({ email })
-		if(usuarioDuplicado) {
-			return res.status(403).json({
-				mensaje: 'Este email no puede utilizarse'
-			})
-		}
-		const usuario = new Usuarios(req.body)
-		const salt = bcrypt.genSaltSync()
-		usuario.password = bcrypt.hashSync(password, salt)
-		await usuario.save()
-		return res.status(200).json({
-			mensaje: 'Usuario creado'
-		})
-	} catch(err) {
-		res.status(500).json({
-			mensaje: 'Ha ocurrido un error al crear el usuario'
-		})
+		const { email } = body
+		const user = await Usuarios.findOne({ email })
+		req.user = user
+		next()
+	} catch (error) {
+		req.user = null
 		next()
 	}
 }
 
-exports.autenticarUsuario = async (req, res, next) => {
-	const { email, password } = req.body
-	const usuario = await Usuarios.findOne({ email })
-	if(!usuario) {
-		await res.status(401).json({
-			mensaje: 'Este email no pertenece a ninguna cuenta'
-		})
-		return next()
-	}
-	if(!bcrypt.compareSync(password, usuario.password)) {
-		await res.status(401).json({
-			mensaje: 'Credenciales incorrectas. Revisa los datos'
-		})
-		return next()
-	}
-	const token = jwt.sign(
-		{
-			email: usuario.email,
-			nombre: usuario.nombre,
-			id: usuario._id
-		},
-		process.env.JWT_SECRET,
-		{
-			expiresIn: '1h'
+/**
+ * Funcion para verificar la contraseña para eliminar a un usuario
+ *
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @param {function} next - continue to the next middleware
+*/
+exports.verificarPasswordParaEliminar = (req, res, next) => {
+	const { body } = req
+	try {
+		const { email, password } = body
+		const superUser = String(process.env.SUPER_USER)
+		const authorization = String(process.env.DELETE_AUTHORIZATION_PASSWORD)
+		const deleteOrder = `${superUser}${authorization}${email}`
+		if (password !== deleteOrder) {
+			return res.status(403).json(createResponse(
+				'La contraseña es inválida',
+				`La contraseña proporcionada no es válida`
+			))
 		}
-	)
-	return res.json({ mensaje: token })
+		next()
+	} catch (error) {
+		return res.status(500).json(internalError({ errors: [ error ] }))
+	}
+}
+
+/**
+ * Funcion para eliminar un usuario registrado
+ *
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @returns {Promise}
+*/
+exports.eliminarUsuario = async (req, res) => {
+	const { user } = req
+	try {
+		if (!user) {
+			return res.status(404).json(createResponse(
+				'El usuario no existe',
+				`Este usuario no esta registrado`
+			))
+		}
+		const { email } = user
+		await Usuarios.findOneAndDelete({ email })
+		return res.status(200).json(createResponse(
+			'Usuario eliminado',
+			`El usuario fue eliminado correctamente de la BBDD`
+		))
+	} catch (error) {
+		return res.status(500).json(internalError({ errors: [ error ] }))
+	}
 }

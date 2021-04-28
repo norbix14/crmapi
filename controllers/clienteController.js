@@ -1,110 +1,159 @@
 const Clientes = require('../models/Clientes')
+const {
+	newClientResponse,
+	showClientResponse,
+	showClientsResponse,
+	updateClientResponse,
+	deleteClientResponse
+} = require('../responses/clients')
+const internalError = require('../responses/internalError')
 
-exports.nuevoCliente = async (req, res, next) => {
+/**
+ * Modulo encargado del manejo de los clientes
+ * 
+ * @module controllers/clienteController
+*/
+
+/**
+ * Funcion para verificar si un cliente existe
+ *
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @param {function} next - continue to the next middleware
+ * @returns {Promise}
+*/
+exports.verificarCliente = async (req, res, next) => {
+	const { body } = req
 	try {
-		const clienteDuplicado = await Clientes.findOne({
-			email: req.body.email
-		})
-		if(clienteDuplicado) {
-			return res.status(401).json({
-				mensaje: 'Este email ya pertenece a otra cuenta'
-			})
-		}
-		const cliente = new Clientes(req.body)
-		await cliente.save()
-		return res.status(200).json({
-			mensaje: 'Nuevo cliente agregado'
-		})
-	} catch(err) {
-		res.status(500).json({
-			mensaje: 'Ha ocurrido un error'
-		})
+		const { email } = body
+		const client = await Clientes.findOne({ email })
+		req.client = client
+		next()
+	} catch (error) {
+		req.client = null
 		next()
 	}
 }
 
-exports.mostrarClientes = async (req, res, next) => {
+/**
+ * Funcion para verificar si un cliente existe segun su `_id`
+ *
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @param {function} next - continue to the next middleware
+ * @returns {Promise}
+*/
+exports.verificarClientePorID = async (req, res, next) => {
+	const { params } = req
 	try {
-		const clientes = await Clientes.find({})
-		if(!clientes) {
-			res.status(404).json({
-				mensaje: 'No hay clientes'
-			})
-			return next()
-		}
-		return res.status(200).json({
-			mensaje: 'Clientes encontrados',
-			datos: clientes
-		})
-	} catch(err) {
-		res.status(500).json({
-			mensaje: 'Ha ocurrido un error'
-		})
+		const { idCliente } = params
+		const client = await Clientes.findById(idCliente)
+		req.client = client
+		next()
+	} catch (error) {
+		req.client = null
 		next()
 	}
 }
 
-exports.mostrarCliente = async (req, res, next) => {
+/**
+ * Funcion para agregar a un nuevo cliente
+ *
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @returns {Promise}
+*/
+exports.nuevoCliente = async (req, res) => {
+	const { body, client } = req
 	try {
-		const cliente = await Clientes.findById(req.params.idCliente)
-		if(!cliente) {
-			res.status(404).json({
-				mensaje: 'Este cliente no existe'
-			})
-			return next()
+		if(client) {
+			return res.status(403).json(newClientResponse(403))
 		}
-		return res.status(200).json({
-			mensaje: 'Datos del cliente',
-			datos: cliente
-		})
-	} catch(err) {
-		res.status(500).json({
-			mensaje: 'Ha ocurrido un error'
-		})
-		next()
+		const newClient = new Clientes(body)
+		await newClient.save()
+		return res.status(200).json(newClientResponse(200))
+	} catch(error) {
+		return res.status(500).json(internalError({ errors: [ error ] }))
 	}
 }
 
-exports.actualizarCliente = async (req, res, next) => {
+/**
+ * Funcion para obtener todos los clientes registrados
+ *
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @returns {Promise}
+*/
+exports.mostrarClientes = async (req, res) => {
 	try {
-		const cliente = await Clientes.findOneAndUpdate(
+		const clients = await Clientes.find({})
+		return res.status(200).json(showClientsResponse(200, { clients }))
+	} catch(error) {
+		return res.status(500).json(internalError({ errors: [ error ] }))
+	}
+}
+
+/**
+ * Funcion para obtener los datos de un cliente registrado
+ *
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @returns {Promise}
+*/
+exports.mostrarCliente = async (req, res) => {
+	const { params } = req
+	try {
+		const { idCliente } = params
+		const client = await Clientes.findById(idCliente)
+		return res.status(200).json(showClientResponse(200, { client }))
+	} catch(error) {
+		return res.status(500).json(internalError({ errors: [ error ] }))
+	}
+}
+
+/**
+ * Funcion para actualizar los datos de un cliente registrado
+ *
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @returns {Promise}
+*/
+exports.actualizarCliente = async (req, res) => {
+	const { body, params } = req
+	try {
+		const { idCliente } = params
+		await Clientes.findOneAndUpdate(
 			{
-				_id: req.params.idCliente
+				_id: idCliente
 			},
-			req.body,
+			body,
 			{
 				new: true
 			}
 		)
-		if(!cliente) {
-			res.status(404).json({
-				mensaje: 'No se ha podido actualizar'
-			})
-			return next()
-		}
-		return res.status(200).json({
-			mensaje: 'El cliente fue actualizado'
-		})
-	} catch(err) {
-		res.status(500).json({
-			mensaje: 'Ha ocurrido un error'
-		})
-		next()
+		return res.status(200).json(updateClientResponse(200))
+	} catch(error) {
+		return res.status(500).json(internalError({ errors: [ error ] }))
 	}
 }
 
-exports.eliminarCliente = async (req, res, next) => {
+/**
+ * Funcion para eliminar un cliente registrado
+ *
+ * @param {object} req - user request
+ * @param {object} res - server response
+ * @returns {Promise}
+*/
+exports.eliminarCliente = async (req, res) => {
+	const { client } = req
 	try {
-		await Clientes.findOneAndDelete({
-			_id: req.params.idCliente
-		})
-		return res.status(200).json({
-			mensaje: 'El cliente se ha eliminado'
-		})
-	} catch(err) {
-		res.status(500).json({
-			mensaje: 'Ha ocurrido un error'
-		})
-		next()
+		if (!client) {
+			return res.status(404).json(deleteClientResponse(404))
+		}
+		const { _id } = client
+		await Clientes.findOneAndDelete({ _id })
+		return res.status(200).json(deleteClientResponse(200))
+	} catch(error) {
+		return res.status(500).json(internalError({ errors: [ error ] }))
 	}
 }

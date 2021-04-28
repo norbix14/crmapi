@@ -1,8 +1,13 @@
-const mongoose = require('mongoose')
+const { Schema, model } = require('mongoose')
 
-const Schema = mongoose.Schema
+/**
+ * Modulo que contiene el esquema/modelo
+ * de los productos
+ *
+ * @module models/Productos
+*/
 
-const productosSchema = new Schema({
+const ProductosSchema = new Schema({
 	nombre: {
 		type: String,
 		trim: true
@@ -15,4 +20,4 @@ const productosSchema = new Schema({
 	}
 })
 
-module.exports = mongoose.model('Productos', productosSchema)
+module.exports = model('Productos', ProductosSchema)

@@ -1,15 +1,23 @@
-const mongoose = require('mongoose')
+const { Schema, model } = require('mongoose')
 
-const Schema = mongoose.Schema
+/**
+ * Modulo que contiene el esquema/modelo
+ * de la imagen de un producto
+ *
+ * @module models/ImagenProducto
+*/
 
-const imagenProductoSchema = new Schema({
+const ImagenProductoSchema = new Schema({
 	secure_url: String,
 	public_id: String,
-	created_at: Date,
+	created_at: {
+		type: Date,
+		default: new Date()
+	},
 	owner: {
 		type: Schema.ObjectId,
 		ref: 'Productos'
 	}
 })
 
-module.exports = mongoose.model('ImagenProducto', imagenProductoSchema)
+module.exports = model('ImagenProducto', ImagenProductoSchema)
