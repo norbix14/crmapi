@@ -24,7 +24,7 @@ exports.httpCreateError = (req, res, next) => {
  * @param {object} req - user request
  * @param {object} res - server response
 */
-exports.httpErrorHandler = (err, req, res) => {
+exports.httpErrorHandler = (err, req, res, next) => {
   if (err) {
     const error = {
       ...err,

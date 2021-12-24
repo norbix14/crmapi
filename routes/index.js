@@ -7,6 +7,7 @@ const clients = require('./clients')
 const products = require('./products')
 const orders = require('./orders')
 const users = require('./users')
+const home = require('./home')
 
 const app = express()
 
@@ -20,6 +21,7 @@ const app = express()
  * Funcion para manejar las rutas
 */
 module.exports = function () {
+	app.use('/', home())
 	app.use('/crear-cuenta', signup())
 	app.use('/iniciar-sesion', login())
 	app.use('/cloud-cred', cloudinary())

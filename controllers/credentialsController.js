@@ -1,7 +1,7 @@
 require('dotenv').config()
 const sha1 = require('sha1')
 const createResponse = require('../responses/response')
-const internalError = require('../responses/internalError')
+const internalError = require('../responses/InternalError')
 
 /**
  * Modulo encargado de la obtencion de credenciales

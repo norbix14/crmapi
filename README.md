@@ -30,22 +30,22 @@ Cuentas en las siguientes plataformas
 
 		# Usuario y contraseña para eliminar usuario por POSTMAN
 		# Es opcional y no afecta la aplicacion mientras se usa
-		SUPER_USER=""
-		DELETE_AUTHORIZATION_PASSWORD=""
+		SUPER_USER="<string>"
+		DELETE_AUTHORIZATION_PASSWORD="<string>"
 
 		# Url del frontend (opcional por politicas CORS)
-		URL_CRM_FE_DEV=""
-		URL_CRM_FE_PROD=""
+		URL_CRM_FE_DEV="<string>"
+		URL_CRM_FE_PROD="<string>"
 
 		# Frase secreta para firmar JsonWebToken
-		JWT_SECRET=""
+		JWT_SECRET="<string>"
 
 		# Credenciales de la cuenta en Cloudinary
-		CLOUDINARY_CLOUD_NAME=""
-		CLOUDINARY_API_KEY=""
-		CLOUDINARY_API_SECRET=""
-		CLOUDINARY_URL_FRONTEND=""
+		CLOUDINARY_CLOUD_NAME="<string>"
+		CLOUDINARY_API_KEY=<number>
+		CLOUDINARY_API_SECRET="<string>"
+		CLOUDINARY_URL_FRONTEND="https://api.cloudinary.com/v1_1/<cloudname>/image/upload"
 
 		# Uri de conexion a la cuenta en MongoDbAtlas
 		MONGODB_URI_LOCAL=""
-		MONGODB_URI_REMOTE=""
+		MONGODB_URI_REMOTE="mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>?retryWrites=true&w=majority"

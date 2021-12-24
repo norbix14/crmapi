@@ -11,7 +11,7 @@ const {
 	updateProductResponse,
 	deleteProductResponse
 } = require('../responses/products')
-const internalError = require('../responses/internalError')
+const internalError = require('../responses/InternalError')
 
 /**
  * Modulo encargado del manejo de los productos

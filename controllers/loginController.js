@@ -1,7 +1,7 @@
 const { jwtSign } = require('../handlers/jwt-handler')
 const { comparePassword } = require('../handlers/password-handler')
 const loginResponse = require('../responses/login')
-const internalError = require('../responses/internalError')
+const internalError = require('../responses/InternalError')
 
 /**
  * Modulo encargado del manejo de la autenticacion

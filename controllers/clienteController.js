@@ -6,7 +6,7 @@ const {
 	updateClientResponse,
 	deleteClientResponse
 } = require('../responses/clients')
-const internalError = require('../responses/internalError')
+const internalError = require('../responses/InternalError')
 
 /**
  * Modulo encargado del manejo de los clientes

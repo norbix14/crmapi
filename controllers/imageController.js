@@ -7,7 +7,7 @@ const {
   newProductImageResponse,
   deleteProductImageResponse
 } = require('../responses/images')
-const internalError = require('../responses/internalError')
+const internalError = require('../responses/InternalError')
 
 /**
  * Modulo encargado del manejo de las imagenes

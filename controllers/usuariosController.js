@@ -1,7 +1,7 @@
 require('dotenv').config()
 const Usuarios = require('../models/Usuarios')
 const createResponse = require('../responses/response')
-const internalError = require('../responses/internalError')
+const internalError = require('../responses/InternalError')
 
 /**
  * Modulo encargado del manejo de los usuarios

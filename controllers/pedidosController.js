@@ -4,7 +4,7 @@ const {
 	showOrdersResponse,
 	deleteOrderResponse
 } = require('../responses/orders')
-const internalError = require('../responses/internalError')
+const internalError = require('../responses/InternalError')
 
 /**
  * Modulo encargado del manejo de los pedidos

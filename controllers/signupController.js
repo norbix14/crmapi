@@ -1,7 +1,7 @@
 const Usuarios = require('../models/Usuarios')
 const { hashPassword } = require('../handlers/password-handler')
 const signupResponse = require('../responses/signup')
-const internalError = require('../responses/internalError')
+const internalError = require('../responses/InternalError')
 
 /**
  * Modulo encargado del manejo de la creacion
